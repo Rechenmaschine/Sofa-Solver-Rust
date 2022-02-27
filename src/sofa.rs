@@ -1,7 +1,7 @@
 use crate::curves::{Curve, Linear};
 use crate::line::Line;
 use std::cmp::max;
-use std::f64::consts::{PI, FRAC_PI_2};
+use std::f64::consts::{FRAC_PI_2, PI};
 use std::time::SystemTime;
 
 pub struct Sofa<E: Curve> {
@@ -13,13 +13,22 @@ pub struct Sofa<E: Curve> {
 
 impl<E: Curve> Sofa<E> {
     pub fn new(curve: E, dx: f64) -> Self {
-        let nullstelle = curve.nullstelle(Interval { lower: 0.0, upper: 1.0 }, 0.00000000000001f64);
-        let curve_interval = Interval{ lower: -nullstelle, upper: nullstelle };
+        let nullstelle = curve.nullstelle(
+            Interval {
+                lower: 0.0,
+                upper: 1.0,
+            },
+            0.00000000000001f64,
+        );
+        let curve_interval = Interval {
+            lower: -nullstelle,
+            upper: nullstelle,
+        };
 
         let corridor = Corridor::new(&curve, curve_interval.lower, &curve_interval);
         let mut best_lines = corridor.get_lines(dx);
 
-        Self{
+        Self {
             curve,
             best_lines,
             curve_interval,
@@ -69,9 +78,12 @@ pub struct Corridor {
 }
 
 impl Corridor {
-    pub fn new<E: Curve>(curve: &E, x: f64, curve_interval: &Interval ) -> Self {
+    pub fn new<E: Curve>(curve: &E, x: f64, curve_interval: &Interval) -> Self {
         let theta = Self::calculate_theta(curve, x, 0.00000000000001f64);
-        let m = Point { x, y: theta.tan() * x, };
+        let m = Point {
+            x,
+            y: theta.tan() * x,
+        };
 
         let tan_left = (theta / 2f64).tan();
         let tan_right = ((theta + PI) / 2f64).tan();
@@ -93,19 +105,39 @@ impl Corridor {
         let nullstelle_aussen = -(wa_right.c) / wa_right.m;
 
         let m_innen = m.clone();
-        let m_aussen = Point{ x: m.x + theta.cos(), y: m.y + theta.sin() };
+        let m_aussen = Point {
+            x: m.x + theta.cos(),
+            y: m.y + theta.sin(),
+        };
 
-        let i1 = Interval{ lower: 0.0, upper: m_innen.x };
-        let i2 = Interval{ lower: m_innen.x, upper: nullstelle_innen };
-        let i3 = Interval{ lower: nullstelle_innen, upper: m_aussen.x };
-        let i4 = Interval { lower: m_aussen.x, upper: 1.0 + curve_interval.upper};
+        let i1 = Interval {
+            lower: 0.0,
+            upper: m_innen.x,
+        };
+        let i2 = Interval {
+            lower: m_innen.x,
+            upper: nullstelle_innen,
+        };
+        let i3 = Interval {
+            lower: nullstelle_innen,
+            upper: m_aussen.x,
+        };
+        let i4 = Interval {
+            lower: m_aussen.x,
+            upper: 1.0 + curve_interval.upper,
+        };
 
-        Self{
-            aussenwand: Envelope { left: wa_left, right: wa_right },
-            innenwand: Envelope { left: wi_left, right: wi_right },
-            intervals: [i1, i2, i3, i4]
+        Self {
+            aussenwand: Envelope {
+                left: wa_left,
+                right: wa_right,
+            },
+            innenwand: Envelope {
+                left: wi_left,
+                right: wi_right,
+            },
+            intervals: [i1, i2, i3, i4],
         }
-
     }
 
     pub fn calculate_theta<E: Curve>(curve: &E, mut x: f64, toleranz: f64) -> f64 {
@@ -127,8 +159,8 @@ impl Corridor {
 
             let r_of_x = r(x, theta);
 
-            if (interval.upper-interval.lower).abs() <= toleranz {
-                return if !is_negative { theta } else { PI - theta }
+            if (interval.upper - interval.lower).abs() <= toleranz {
+                return if !is_negative { theta } else { PI - theta };
             } else if curve_y < r_of_x {
                 interval.upper = theta;
             } else {
@@ -172,8 +204,8 @@ impl Corridor {
                 });
                 x += dx;
             }
-        }
-        else { //Wenn Mittelpunkt über Nullstelle herausragt
+        } else {
+            //Wenn Mittelpunkt über Nullstelle herausragt
             let i2 = self.intervals[1];
             while x < x_aussen {
                 lines.push(Line {

@@ -3,17 +3,19 @@ use crate::sofa::Interval;
 pub trait Curve: Clone {
     fn f(&self, x: f64) -> f64;
 
-    fn nullstelle(&self, mut interval: Interval, toleranz: f64) ->f64{
+    fn nullstelle(&self, mut interval: Interval, toleranz: f64) -> f64 {
         while interval.lower <= interval.upper {
             let x = (interval.lower + interval.upper) / 2f64;
 
             let f_of_x = self.f(x);
 
-            if (interval.upper-interval.lower).abs() <= toleranz {
+            if (interval.upper - interval.lower).abs() <= toleranz {
                 return interval.lower;
             } else if f_of_x < 0.0 {
                 interval.upper = x;
-            } else /* f_of_x > 0.0 */{
+            } else
+            /* f_of_x > 0.0 */
+            {
                 interval.lower = x;
             }
         }
@@ -45,10 +47,9 @@ pub struct Ellipse {
 
 impl Ellipse {
     pub fn new(coefficients: Vec<f64>) -> Self {
-        Self {
-            coefficients,
-        }
-    }}
+        Self { coefficients }
+    }
+}
 impl Curve for Ellipse {
     fn f(&self, x: f64) -> f64 {
         (self.coefficients[1] / self.coefficients[0])
@@ -80,5 +81,22 @@ impl Curve for Polynomial {
             y += self.coefficients[i] * x.powi((2 * i) as i32)
         }
         return y;
+    }
+}
+
+#[derive(Clone)]
+pub struct HyperbolicCosine {
+    pub coefficients: Vec<f64>,
+}
+impl HyperbolicCosine {
+    pub fn new(coefficients: Vec<f64>) -> Self {
+        Self { coefficients }
+    }
+}
+impl Curve for HyperbolicCosine {
+    fn f(&self, x: f64) -> f64 {
+        return self.coefficients[0]
+            * ((self.coefficients[2] * x).exp() + (-self.coefficients[2] * x).exp())/ (self.coefficients[1])
+            + self.coefficients[3];
     }
 }
