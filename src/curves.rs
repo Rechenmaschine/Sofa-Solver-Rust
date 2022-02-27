@@ -1,52 +1,72 @@
-use std::f64::consts::{PI};
-use crate::search_space::{X_RANGE};
+use crate::sofa::Interval;
 
 pub trait Curve: Clone {
-    //fn get_coefficients(&self) -> Vec<f64>;
-
-    fn get_theta(&self, x: f64, y: f64) -> f64{
-        let r = (x*x + y*y).sqrt();
-        return (x/r).acos();
-    }
-
-    fn relevant_interval(&self, x_step_size: f64) -> Vec<[f64; 3]> {
-        let mut relevant_points = vec![];
-        let mut x = 0f64;
-        loop {
-            let y = self.f(x);
-
-            if !(y >= 0f64) {
-                break;
-            }
-            if !(x <= X_RANGE) {
-                return vec![];
-            }
-            let theta = self.get_theta(x, y);
-            relevant_points.push([theta, x, y]);
-            relevant_points.push([PI-theta, -x, y]);
-            x += x_step_size;
-        }
-        return relevant_points;
-    }
-
     fn f(&self, x: f64) -> f64;
+
+    fn nullstelle(&self, mut interval: Interval, toleranz: f64) ->f64{
+        while interval.lower <= interval.upper {
+            let x = (interval.lower + interval.upper) / 2f64;
+
+            let f_of_x = self.f(x);
+
+            if (interval.upper-interval.lower).abs() <= toleranz {
+                return interval.lower;
+            } else if f_of_x < 0.0 {
+                interval.upper = x;
+            } else /* f_of_x > 0.0 */{
+                interval.lower = x;
+            }
+        }
+        panic!("Failed to calculate theta")
+    }
 }
 
 #[derive(Clone)]
-pub struct Ellipse{
-    pub coefficients:Vec<f64>
+pub struct Linear {
+    pub m: f64,
+    pub c: f64,
 }
+
+impl Linear {
+    pub fn new(m: f64, c: f64) -> Self {
+        Self { m, c }
+    }
+}
+impl Curve for Linear {
+    fn f(&self, x: f64) -> f64 {
+        self.m * x + self.c
+    }
+}
+
+#[derive(Clone)]
+pub struct Ellipse {
+    pub coefficients: Vec<f64>,
+}
+
+impl Ellipse {
+    pub fn new(coefficients: Vec<f64>) -> Self {
+        Self { coefficients, }
+    }}
 impl Curve for Ellipse {
     fn f(&self, x: f64) -> f64 {
-        (self.coefficients[1] / self.coefficients[0]) * (self.coefficients[0]*self.coefficients[0] - x*x).sqrt()
+        (self.coefficients[1] / self.coefficients[0])
+            * (self.coefficients[0] * self.coefficients[0] - x * x).sqrt()
     }
 }
 
-
 #[derive(Clone)]
-pub struct Polynomial{
-    pub coefficients:Vec<f64>,
-    degree: u32
+pub struct Polynomial {
+    pub coefficients: Vec<f64>,
+    degree: u32,
+}
+impl Polynomial {
+    pub fn new(coefficients: Vec<f64>) -> Self {
+        let degree = coefficients.len() as u32;
+        Self {
+            coefficients,
+            degree,
+        }
+    }
 }
 impl Curve for Polynomial {
     fn f(&self, x: f64) -> f64 {
@@ -57,4 +77,3 @@ impl Curve for Polynomial {
         return y;
     }
 }
-
