@@ -100,3 +100,18 @@ impl Curve for HyperbolicCosine {
             + self.coefficients[3];
     }
 }
+
+#[derive(Clone)]
+pub struct Secant {
+    pub coefficients: Vec<f64>,
+}
+impl Secant {
+    pub fn new(coefficients: Vec<f64>) -> Self {
+        Self { coefficients }
+    }
+}
+impl Curve for Secant {
+    fn f(&self, x: f64) -> f64 {
+        return (self.coefficients[0] / (self.coefficients[1]*x).cos()) + self.coefficients[2];
+    }
+}
