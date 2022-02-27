@@ -13,7 +13,7 @@ pub struct Sofa<E: Curve> {
 
 impl<E: Curve> Sofa<E> {
     pub fn new(curve: E, dx: f64) -> Self {
-        let nullstelle = curve.nullstelle(Interval { lower: 0.0, upper: 1.0 }, 0.00000001f64);
+        let nullstelle = curve.nullstelle(Interval { lower: 0.0, upper: 1.0 }, 0.00000000000001f64);
         let curve_interval = Interval{ lower: -nullstelle, upper: nullstelle };
 
         let corridor = Corridor::new(&curve, curve_interval.lower, &curve_interval);
@@ -70,7 +70,7 @@ pub struct Corridor {
 
 impl Corridor {
     pub fn new<E: Curve>(curve: &E, x: f64, curve_interval: &Interval ) -> Self {
-        let theta = Self::calculate_theta(curve, x, 0.00000001f64);
+        let theta = Self::calculate_theta(curve, x, 0.00000000000001f64);
         let m = Point { x, y: theta.tan() * x, };
 
         let tan_left = (theta / 2f64).tan();

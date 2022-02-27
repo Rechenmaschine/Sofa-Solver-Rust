@@ -45,12 +45,17 @@ pub struct Ellipse {
 
 impl Ellipse {
     pub fn new(coefficients: Vec<f64>) -> Self {
-        Self { coefficients, }
+        Self {
+            coefficients,
+        }
     }}
 impl Curve for Ellipse {
     fn f(&self, x: f64) -> f64 {
         (self.coefficients[1] / self.coefficients[0])
             * (self.coefficients[0] * self.coefficients[0] - x * x).sqrt()
+    }
+    fn nullstelle(&self, interval: Interval, toleranz: f64) -> f64 {
+        self.coefficients[0]
     }
 }
 
