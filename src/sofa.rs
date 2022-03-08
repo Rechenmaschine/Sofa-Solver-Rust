@@ -54,14 +54,14 @@ impl<E: Curve> Sofa<E> {
             x += r_dx;
         }
         let time_taken = SystemTime::now().duration_since(start).unwrap();
-        println!("Calculation of Sofa took: {:?}", time_taken);
+        //println!("Calculation of Sofa took: {:?}", time_taken);
     }
 
     fn cutout_corridor(&mut self, corridor: &Corridor) {
         let cutout = &corridor.get_lines(self.dx);
         if cutout.len() != self.best_lines.len() {
-            println!("Cutout: {}, best: {}", cutout.len(), self.best_lines.len());
-            panic!("Different amount of lines in cutout and best");
+            //println!("Cutout: {}, best: {}", cutout.len(), self.best_lines.len());
+            //panic!("Different amount of lines in cutout and best");
             return;
         }
 
