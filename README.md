@@ -1,6 +1,6 @@
 ## Sofa-Solver-Rust
 
-This programm aims to calculate the maximum area of a Sofa, by cutting out the shape of the sofa by moving the corridor along a curve. This approach is inspired by <u>this JugendForscht Paper</u> from <u>Patrick Sonnentag</u>.
+This programm aims to calculate the maximum area of a Sofa, by cutting out the shape of the sofa by moving the corridor along a curve. This program is inspired by [this JugendForscht paper](https://github.com/PatrickSonnentag/SofaProblemApproximation/blob/master/JuFo2022LW.pdf) by [Patrick Sonnentag](https://github.com/PatrickSonnentag).
 
 
 ## The Moving Sofa Problem
